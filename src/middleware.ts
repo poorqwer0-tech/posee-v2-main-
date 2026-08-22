@@ -13,6 +13,7 @@ const TRULY_PUBLIC = [
   "/api/payment-request",
   "/api/order-cancel",
   "/api/table-open-request",
+  "/api/stock-app",
   "/table",
   "/t",
   "/_next",

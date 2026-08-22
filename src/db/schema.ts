@@ -186,6 +186,28 @@ export const rateLimits = sqliteTable("rate_limits", {
   resetAt: integer("reset_at").notNull().default(0),
 });
 
+// ===== ระบบสต๊อกสินค้าแยก (stock management app) =====
+export const stockProducts = sqliteTable("stock_products", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  sku: text("sku").notNull().unique(),
+  qty: real("qty").notNull().default(0),
+  unit: text("unit").notNull().default("ชิ้น"),
+  price: real("price").notNull().default(0),
+});
+
+export const stockMovements = sqliteTable("stock_movements", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  sku: text("sku").notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // รับเข้า / เบิกออก / ปรับยอด
+  qty: real("qty").notNull(),
+  balance: real("balance").notNull(),
+  date: text("date").notNull(),
+  user: text("user").notNull().default(""),
+  note: text("note").notNull().default(""),
+});
+
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Order = typeof orders.$inferSelect;
