@@ -1,0 +1,1328 @@
+/* ============================================================
+   ระบบสต๊อกสินค้า — ธีมน้ำเงิน มีทั้งโหมดสว่างและโหมดมืด
+   เรียงตามลำดับที่เห็นบนหน้าจอ: base → เข้าสู่ระบบ → แถบหัว →
+   ไซด์บาร์ → หัวเรื่อง → KPI → แถบค้นหา → ตาราง → ประวัติ →
+   โมดัล → ฟอร์ม → ปุ่ม → toast → จอแคบ
+
+   สีทั้งหมดอยู่ในตัวแปรของ :root ชุดเดียว โหมดมืดคือการทับค่าตัวแปรชุดนั้น
+   ส่วนที่เหลือของไฟล์จึงไม่ต้องรู้เลยว่าตอนนี้เป็นธีมไหน
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* น้ำเงินสดเป็นสีหลักของแบรนด์ ใช้กับปุ่มหลัก แถบหัว สถานะที่กำลังเลือกอยู่ และวงโฟกัส
+     จึงใช้เฉดเดียวกับ --accent ส่วน --primary-d เป็นเฉดเข้มลงไว้ใช้ตอน hover */
+  --primary:     #2f5ce0;
+  --primary-d:   #2649bd;
+  --on-primary:  #ffffff;
+
+  --accent:      #2f5ce0;
+  --accent-soft: #eaf0ff;
+  --accent-line: #cfdcff;
+  --ring:        rgba(47, 92, 224, .16);
+
+  --bg:          #f8f9ff;
+  --surface:     #ffffff;
+  --face:        #f5f6fb;
+  --hover:       #f8f9ff;
+
+  --border:      #dfe1ee;
+  --border-l:    #eceef7;
+
+  --text:        #0e1940;
+  --label:       #3d465f;
+  --muted:       #6b7490;
+  --faint:       #868ea9;
+
+  /* คู่สีของแต่ละสถานะ: ตัวอักษร / พื้นอ่อน (ไอคอน KPI, ปุ่มเลือกโหมด) / พื้นทึบ (ป้ายสถานะ)
+     เฉดพื้นทึบเข้มกว่าในภาพต้นแบบเล็กน้อย เพราะของเดิมตัวหนังสือขาวคอนทราสต์ไม่ผ่าน */
+  --green:        #2f7d4a;
+  --green-bg:     #e6f4ea;
+  --green-solid:  #387d4b;
+  --danger:       #c63328;
+  --danger-bg:    #fdecea;
+  --danger-solid: #c63328;
+  --amber:        #9a7526;
+  --amber-bg:     #fcf3e0;
+  --amber-solid:  #dab36a;
+  --on-amber:     #0e1940;   /* เหลืองสว่างเกินกว่าจะใช้ตัวหนังสือขาว */
+  --info-solid:   #476082;
+  --mute-solid:   #6f7488;
+  --on-solid:     #ffffff;
+
+  --topbar-bg:   var(--primary);
+  --topbar-fg:   #ffffff;
+  --topbar-sub:  rgba(255, 255, 255, .7);
+  --topbar-line: transparent;
+  --topbar-hov:  rgba(255, 255, 255, .14);
+  --topbar-pill: rgba(255, 255, 255, .18);
+  --topbar-pill-fg: #ffffff;
+
+  --scrim:       rgba(14, 25, 64, .5);
+  --shadow-lg:   0 24px 60px rgba(14, 25, 64, .24);
+  --shadow-sm:   0 10px 26px rgba(14, 25, 64, .1);
+
+  /* วอลเปเปอร์หน้าเข้าสู่ระบบ — จางไว้ให้เป็นแค่พื้นหลัง การ์ดต้องเด่นกว่าเสมอ */
+  --login-glow:  rgba(47, 92, 224, .13);
+  --login-glow2: rgba(47, 92, 224, .07);
+  --login-dot:   rgba(47, 92, 224, .07);
+
+  --radius:      10px;
+  --radius-sm:   7px;
+
+  --topbar-h:    64px;
+  --side-w:      236px;
+
+  /* ใช้ฟอนต์ในเครื่องก่อนเพื่อเปิดหน้าให้เร็ว ไม่ดึง Google Fonts จากภายนอก */
+  --font: 'Sarabun', system-ui, -apple-system, 'Segoe UI', 'Leelawadee UI',
+          'Noto Sans Thai', Tahoma, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* โหมดมืด — พื้นเข้มอมคราม ไม่ใช่เทาหม่นและไม่ใช่ดำสนิท (ขาวบนดำสนิทจะแสบตา)
+   เก็บความสดของสีไว้เท่าโหมดสว่าง: พื้นป้ายสถานะยังเป็นสีจริงแค่เข้มลง ไม่ใช่เทา
+   สีครามสว่างขึ้นเพื่อให้อ่านออกบนพื้นเข้ม ปุ่มครามจึงต้องใช้ตัวหนังสือสีเข้มแทนสีขาว */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --primary:     #3e57c9;
+  --primary-d:   #4d67dd;
+  --on-primary:  #ffffff;
+
+  --accent:      #7f9cff;
+  --accent-soft: #232c56;
+  --accent-line: #3a478a;
+  --ring:        rgba(127, 156, 255, .3);
+
+  --bg:          #0c0f21;
+  --surface:     #151a33;
+  --face:        #1d2344;
+  --hover:       #1b2140;
+
+  --border:      #2c345e;
+  --border-l:    #242b52;
+
+  --text:        #edeffc;
+  --label:       #c8cdec;
+  --muted:       #959bc6;
+  --faint:       #6f76a6;
+
+  /* พื้นทึบของป้ายสถานะสว่างขึ้นกว่าโหมดสว่าง เพราะต้องเด่นออกมาจากพื้นเข้ม */
+  --green:        #2ddb9b;
+  --green-bg:     #0e3d33;
+  --green-solid:  #2b8459;
+  --danger:       #ff6b73;
+  --danger-bg:    #451d2e;
+  --danger-solid: #b93b43;
+  --amber:        #e0b262;
+  --amber-bg:     #3a2f18;
+  --amber-solid:  #c99b4b;
+  --on-amber:     #1a1408;
+  --info-solid:   #4a6690;
+  --mute-solid:   #4c5372;
+  --on-solid:     #ffffff;
+
+  --topbar-bg:   #171f45;
+  --topbar-fg:   #ffffff;
+  --topbar-sub:  rgba(255, 255, 255, .68);
+  --topbar-line: #2c3768;
+  --topbar-hov:  rgba(255, 255, 255, .12);
+  --topbar-pill: rgba(255, 255, 255, .16);
+  --topbar-pill-fg: #ffffff;
+
+  --scrim:       rgba(3, 5, 18, .7);
+  --shadow-lg:   0 24px 60px rgba(0, 0, 0, .62);
+  --shadow-sm:   0 12px 30px rgba(0, 0, 0, .45);
+
+  --login-glow:  rgba(127, 156, 255, .15);
+  --login-glow2: rgba(62, 87, 201, .16);
+  --login-dot:   rgba(127, 156, 255, .07);
+}
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.55;
+  background: var(--bg);
+  color: var(--text);
+  /* เว้นที่ให้แถบหัวที่ position:fixed ทับอยู่ด้านบน */
+  padding-top: var(--topbar-h);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* วอลเปเปอร์ของหน้าข้างใน ลายเดียวกับหน้าเข้าสู่ระบบให้เป็นเรื่องเดียวกัน
+   ตรึงไว้กับจอ (fixed) ไม่ให้เลื่อนตามตาราง และอยู่หลังทุกอย่างด้วย z-index ติดลบ */
+body:not(.guest)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(var(--login-dot) 1px, transparent 1.4px),
+    radial-gradient(52% 46% at 4% 12%,  var(--login-glow),  transparent 72%),
+    radial-gradient(50% 45% at 96% 92%, var(--login-glow2), transparent 72%);
+  background-size: 22px 22px, auto, auto;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  flex: none;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── สวิตช์สลับธีมสว่าง / มืด ──────────────────────────────────
+   ปุ่มกลมเลื่อนไปทางดวงอาทิตย์เมื่อเป็นธีมสว่าง และเลื่อนไปทางพระจันทร์เมื่อเป็นธีมมืด
+   ตำแหน่งอ่านจาก data-theme ที่ราก ไม่ต้องให้ JS มาคอยสลับคลาสให้ */
+.theme-sw {
+  position: relative;
+  width: 56px;
+  height: 30px;
+  flex: none;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 99px;
+  background: var(--face);
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.sw-ic {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--faint);
+}
+.sw-sun  { left: 7px; }
+.sw-moon { right: 7px; }
+
+.sw-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+  transition: transform .22s ease;
+}
+
+.sw-knob .k-sun,
+.sw-knob .k-moon { width: 14px; height: 14px; }
+
+/* โชว์ไอคอนของธีมที่ใช้อยู่บนตัวปุ่ม อีกอันจะโผล่อยู่ปลายอีกฝั่งของราง */
+.sw-knob .k-moon { display: none; }
+:root[data-theme="dark"] .sw-knob { transform: translateX(26px); }
+:root[data-theme="dark"] .sw-knob .k-sun  { display: none; }
+:root[data-theme="dark"] .sw-knob .k-moon { display: block; }
+
+#login .theme-sw { border-color: var(--border); }
+.brand .theme-sw { background: var(--topbar-hov); }
+.brand .sw-ic    { color: var(--topbar-sub); }
+
+/* ── หน้าเข้าสู่ระบบ — ซ่อนทั้งแอปไว้จนกว่าจะเข้าระบบสำเร็จ ────── */
+body.guest .brand,
+body.guest .sidebar,
+body.guest .nav-scrim,
+body.guest .app { display: none; }
+
+body:not(.guest) #login { display: none; }
+
+/* พนักงานเห็นข้อมูลได้ทั้งหมด แต่ปุ่มที่กดไปก็จะโดนเซิร์ฟเวอร์ปฏิเสธอยู่ดี จึงซ่อนไปเลย */
+body:not(.admin) .admin-only { display: none; }
+
+#login {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+
+  /* ลายจุดถี่ ๆ ทับด้วยแสงเรืองสองมุมตรงข้าม ให้พื้นไม่เรียบโล่งแต่ยังไม่แย่งสายตาการ์ด */
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(var(--login-dot) 1px, transparent 1.4px),
+    radial-gradient(58% 52% at 10% 6%,  var(--login-glow),  transparent 72%),
+    radial-gradient(55% 50% at 90% 94%, var(--login-glow2), transparent 72%);
+  background-size: 22px 22px, auto, auto;
+  background-attachment: fixed;
+}
+
+/* สวิตช์บนหน้าเข้าสู่ระบบลอยอยู่บนพื้นเปล่า ต้องให้รางเข้มกว่าพื้นหน่อย
+   ไม่งั้นปุ่มสีขาวจะกลืนไปกับรางจนดูเหมือนไอคอนสองอันลอย ๆ ไม่เหมือนสวิตช์ */
+#login .theme-sw {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--border-l);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px 30px 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* หน้าเข้าสู่ระบบวางทุกอย่างไว้กึ่งกลาง — โลโก้ ชื่อระบบ และคำอธิบาย
+   เหลือแค่ช่องกรอกที่ยังชิดซ้าย เพราะป้ายชื่อช่องต้องเริ่มตรงกับตัวช่องถึงจะกวาดตาอ่านง่าย */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* โลโก้เป็นภาพสีในตัวเอง ไม่ต้องมีพื้นหลังรองหรือระบายสีทับ ปล่อยให้ภาพเล่าตัวเอง */
+.login-logo {
+  width: 76px;
+  height: 76px;
+  margin-bottom: 14px;
+  flex: none;
+  object-fit: contain;
+}
+
+.login-brand h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+
+.login-sub {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.login-card .field + .field { margin-top: 14px; }
+
+/* ข้อความผิดพลาดอยู่ติดกับปุ่ม ไม่ใช่ toast มุมจอ ตาจะได้ไม่ต้องวิ่งไปหา */
+.login-err {
+  display: none;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 13px;
+  border-radius: var(--radius-sm);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+}
+.login-err:not(:empty) { display: block; }
+
+.login-go {
+  width: 100%;
+  height: 44px;
+  margin-top: 20px;
+}
+
+/* ปุ่มดูรหัสผ่านที่กดสลับได้ ซ้อนอยู่ในช่องกรอกทางขวา */
+.pass { position: relative; }
+.pass input { padding-right: 42px; }
+
+.pass-eye {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+}
+.pass-eye:hover { color: var(--text); }
+.pass-eye::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  -webkit-mask: var(--eye) center / contain no-repeat;
+  mask: var(--eye) center / contain no-repeat;
+  --eye: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='2.6'/%3E%3C/svg%3E");
+}
+.pass-eye.on::before {
+  --eye: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M2 12s3.6-6.5 10-6.5c1.9 0 3.5.6 4.8 1.3M22 12s-1.4 2.5-4 4.3M11 18.4c.3 0 .7.1 1 .1'/%3E%3Cpath d='M4 20 20 4'/%3E%3C/svg%3E");
+}
+
+/* ── แถบหัว — พาดเต็มความกว้างเหนือทั้งไซด์บาร์และเนื้อหา ────── */
+.brand {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--topbar-line);
+  background: var(--topbar-bg);
+  color: var(--topbar-fg);
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  object-fit: contain;
+}
+
+/* ชื่อระบบยอมถูกตัดด้วย … ได้ ไม่งั้นบนจอแคบจะขึ้นบรรทัดใหม่จนล้นแถบหัวที่สูงคงที่ */
+.brand-name { min-width: 0; }
+
+.brand b {
+  display: block;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand small {
+  display: block;
+  margin-top: -2px;
+  font-size: 12px;
+  color: var(--topbar-sub);
+}
+
+.brand-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.ic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  flex: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background .15s;
+}
+.brand .ic-btn:hover { background: var(--topbar-hov); }
+
+/* ชื่อคนที่เข้าระบบอยู่ กันคนกรอกผิดบัญชีแล้วไม่รู้ตัว */
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 6px 0 8px;
+  padding-left: 14px;
+  border-left: 1px solid var(--topbar-hov);
+  min-width: 0;
+}
+
+.who-name {
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip {
+  padding: 1px 9px;
+  border-radius: 99px;
+  background: var(--face);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.brand .chip { background: var(--topbar-hov); color: inherit; }
+.brand .chip-admin { background: var(--topbar-pill); color: var(--topbar-pill-fg); }
+
+/* ปุ่มสามขีดกับฉากหลังของลิ้นชักมีไว้ใช้บนจอแคบเท่านั้น จอกว้างไซด์บาร์ค้างอยู่แล้ว */
+.nav-toggle,
+.nav-scrim { display: none; }
+
+/* ── ไซด์บาร์ — การ์ดขาวลอยอยู่บนพื้นเทา ─────────────────── */
+.sidebar {
+  position: fixed;
+  top: calc(var(--topbar-h) + 16px);
+  bottom: 16px;
+  left: 16px;
+  width: var(--side-w);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow-y: auto;
+}
+
+.nav-label {
+  padding: 4px 10px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sidebar nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font: 500 14px var(--font);
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sidebar nav button:hover { background: var(--face); color: var(--text); }
+
+/* แท็บที่เปิดอยู่ — พื้นครามจาง ตัวหนังสือกับไอคอนเป็นสีคราม */
+.sidebar nav button[aria-selected="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nav-ic {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: inherit;
+}
+
+/* ตัวเลขแจ้งเตือนข้างเมนู — ซ่อนไว้จนกว่าจะมีของหมดสต๊อก */
+.sidebar .badge {
+  display: none;
+  margin-left: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+.sidebar .badge.show { display: block; }
+
+/* ── พื้นที่เนื้อหา ───────────────────────────────────────── */
+.app {
+  margin-left: calc(var(--side-w) + 32px);
+  padding: 16px 24px 28px;
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.topbar .spacer { flex: 1; }
+
+.crumb {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.topbar h1 {
+  margin-top: 2px;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+
+.view { display: block; }
+.view[hidden] { display: none; }
+
+/* ── แถบยอดรวม ────────────────────────────────────────────── */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.kpi-info { min-width: 0; flex: 1; text-align: right; }
+
+.kpi .lab {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.kpi .val {
+  margin: 1px 0;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi .sub {
+  font-size: 12px;
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi .sub .neu { color: var(--accent); font-weight: 600; }
+.kpi .sub .neg { color: var(--danger); font-weight: 600; }
+
+/* ไอคอนอยู่วงกลมสีจางทางซ้ายของการ์ด (row-reverse สลับที่ให้โดยไม่ต้องแก้ HTML) */
+.badge-ic {
+  width: 52px;
+  height: 52px;
+  padding: 13px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* ไอคอนที่เป็นไฟล์ภาพมีสีในตัวอยู่แล้ว เลยไม่ต้องมีวงกลมพื้นหลังและวางได้ใหญ่กว่า */
+.badge-ic.ic-img {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  background: none;
+}
+
+.badge-ic img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.gb-primary { background: var(--accent-soft); color: var(--accent); }
+.gb-success { background: var(--green-bg);    color: var(--green); }
+.gb-danger  { background: var(--danger-bg);   color: var(--danger); }
+
+/* ── แถบค้นหา / ตัวกรอง ───────────────────────────────────── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 340px;
+  max-width: 100%;
+  height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color .15s, box-shadow .15s;
+}
+.search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.search svg {
+  width: 17px;
+  height: 17px;
+  color: var(--faint);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  color: var(--text);
+}
+.search input::placeholder { color: var(--faint); }
+
+.filter {
+  height: 40px;
+  min-width: 160px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font: inherit;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.filter:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* ── การ์ด + ตาราง ────────────────────────────────────────── */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-l);
+}
+
+.card-head h2 {
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.card-head .cnt {
+  margin-left: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* จอแคบกว่าความกว้างที่ตารางต้องใช้ ต้องให้เลื่อนดูทางขวาได้
+   ไม่งั้น overflow:hidden ของการ์ดจะตัดคอลัมน์ท้าย ๆ ทิ้ง แล้วปุ่มจัดการจะกดไม่ได้เลย */
+.t-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* หัวตาราง — ไม่ตัวพิมพ์ใหญ่/ไม่ถ่างตัวอักษร ภาษาไทยอ่านยากขึ้นเปล่า ๆ */
+th {
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--face);
+  border-bottom: 1px solid var(--border-l);
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-l);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* คอลัมน์ที่เป็นข้อความยาวไม่เท่ากัน (ชื่อสินค้า วันที่) ชิดซ้ายไว้จะกวาดตาอ่านง่ายกว่าจัดกลาง */
+th.l, td.l { text-align: left; }
+
+tbody tr:hover { background: var(--hover); }
+tbody tr:last-child td { border-bottom: none; }
+
+.p-name { font-weight: 600; }
+
+.p-sku {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.stock-cell b {
+  font-size: 14.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.col-unit { color: var(--muted); }
+
+td.col-price { color: var(--label); font-variant-numeric: tabular-nums; }
+
+td.col-value { font-variant-numeric: tabular-nums; }
+
+/* ป้ายสถานะ — พื้นทึบตัวหนังสือขาว อ่านออกแต่ไกลและแยกสถานะได้ทันทีจากสี
+   จุดสีเล็ก ๆ ที่เคยมีไม่ต้องแล้ว พื้นทึบทำหน้าที่นั้นแทน */
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  color: var(--on-solid);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+
+.s-ok    { background: var(--green-solid); }
+.s-out   { background: var(--danger-solid); }
+.s-admin { background: var(--info-solid); }
+.s-staff { background: var(--mute-solid); }
+
+.row-actions {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.act-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+/* แต่ละปุ่มใช้สีของงานที่ทำ: แก้ไข = ครามแบบแบรนด์ / ปรับสต๊อก = เขียว / ลบ = แดง
+   สถานะปกติเป็นพื้นอ่อน พอชี้เมาส์ค่อยเปลี่ยนเป็นพื้นทึบเพื่อบอกว่ากดได้ */
+.act-btn.edit   { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+.act-btn.edit:hover   { background: var(--primary);      color: var(--on-primary); border-color: var(--primary); }
+.act-btn.move   { background: var(--green-bg);    color: var(--green);  border-color: var(--green-bg); }
+.act-btn.move:hover   { background: var(--green-solid);  color: var(--on-solid);   border-color: var(--green-solid); }
+.act-btn.danger { background: var(--danger-bg);   color: var(--danger); border-color: var(--danger-bg); }
+.act-btn.danger:hover { background: var(--danger-solid); color: var(--on-solid);   border-color: var(--danger-solid); }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 20px;
+  color: var(--faint);
+  text-align: center;
+  white-space: normal;
+}
+
+.empty svg {
+  width: 42px;
+  height: 42px;
+  opacity: .55;
+}
+
+/* ── หน้าตั้งค่า ───────────────────────────────────────────── */
+.set-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.set-body { padding: 6px 20px 16px; }
+
+/* ป้ายชื่อชิดซ้าย ค่าชิดขวา อ่านไล่ลงมาเป็นคู่ ๆ ได้เร็ว */
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 52px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-l);
+}
+.set-row:last-child { border-bottom: none; }
+
+.set-lab {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.set-val {
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+.set-mono { font-family: var(--mono); font-size: 13px; }
+
+/* ── ตารางประวัติการเคลื่อนไหว ────────────────────────────── */
+.mv-date {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ป้ายประเภทรายการ — ใช้รูปทรงเดียวกับป้ายสถานะในตารางสินค้า */
+.mv-type {
+  display: inline-block;
+  min-width: 88px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  color: var(--on-solid);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mv-type.in     { background: var(--green-solid); }
+.mv-type.out    { background: var(--danger-solid); }
+/* เหลืองสว่างเกินกว่าจะใช้ตัวหนังสือขาว จึงสลับไปใช้สีกรมท่าแทน */
+.mv-type.adjust { background: var(--amber-solid); color: var(--on-amber); }
+
+.mv-delta {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mv-delta.in     { color: var(--green); }
+.mv-delta.out    { color: var(--danger); }
+.mv-delta.adjust { color: var(--amber); }
+
+/* ยอดก่อนทำรายการเป็นข้อมูลอ้างอิง ไม่ใช่ตัวเลขที่ต้องอ่าน จึงจางกว่าคอลัมน์อื่น */
+.mv-before { color: var(--faint); font-variant-numeric: tabular-nums; }
+
+.mv-after { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ชื่อผู้ใช้ที่ทำรายการ — ตัวเดียวกับที่ใช้เข้าสู่ระบบ จึงใช้ฟอนต์เดียวกับรหัสสินค้า */
+.mv-user {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* หมายเหตุยาวได้ไม่จำกัด ถ้าไม่ตัดจะดันตารางกว้างจนคอลัมน์อื่นตกขอบ
+   (ข้อความเต็มดูได้จาก tooltip ของเบราว์เซอร์) */
+.col-note {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+
+/* ── กล่องโต้ตอบ ──────────────────────────────────────────── */
+.scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--scrim);
+  overflow-y: auto;
+}
+.scrim.open { display: flex; }
+
+.modal {
+  width: 100%;
+  max-width: 580px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.m-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-l);
+}
+
+.m-head h2 { font-size: 17px; font-weight: 600; }
+
+.m-head p {
+  margin-top: 1px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.m-head .x {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--faint);
+  font-size: 13px;
+  cursor: pointer;
+  flex: none;
+  transition: background .15s, color .15s;
+}
+.m-head .x:hover { background: var(--danger-bg); color: var(--danger); }
+
+.m-body { padding: 20px 22px 22px; }
+
+/* เว้นระยะเฉพาะช่องที่วางเรียงกันตรง ๆ ไม่แตะช่องที่อยู่ใน .grid2 ซึ่งมี gap ของตัวเองแล้ว */
+.m-body > .field + .field { margin-top: 14px; }
+
+/* ยอดคงเหลือปัจจุบันในหน้าปรับสต๊อก */
+.cur-stock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: 13px;
+  color: var(--label);
+}
+
+.cur-stock b {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* เลือกโหมด รับเข้า / เบิกออก / ปรับยอด */
+.seg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.seg button {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 9px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.seg button:hover { border-color: var(--faint); color: var(--text); }
+
+.seg .big { font-size: 13.5px; font-weight: 600; }
+.seg .sm  { font-size: 11.5px; }
+
+/* โหมดที่เลือกอยู่ — script ตั้ง class เป็น on-in / on-out / on-adjust */
+.seg .on-in {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+.seg .on-out {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.seg .on-adjust {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* ── ฟอร์ม ────────────────────────────────────────────────── */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+
+.field { min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+
+.lbl {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--label);
+}
+
+.req { color: var(--danger); }
+
+.field input,
+.field select {
+  width: 100%;
+  height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font: inherit;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field input::placeholder { color: var(--faint); }
+
+.field select { cursor: pointer; }
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.field input:disabled {
+  background: var(--face);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.hint {
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.hint:empty { display: none; }
+
+.m-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-l);
+}
+
+/* ── ปุ่ม ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 13.5px var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn svg { width: 17px; height: 17px; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn[hidden] { display: none; }   /* display:inline-flex ข้างบนทับค่ามาตรฐานของ [hidden] */
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-d);
+  border-color: var(--primary-d);
+}
+
+.btn-ghost { color: var(--label); }
+.btn-ghost:hover:not(:disabled) { background: var(--face); border-color: var(--faint); }
+
+/* ── มุมขวาล่าง — ข้อความแจ้งผล กับตัวบอกว่ากำลังโหลดข้อมูล ──
+   อยู่ในสแต็กเดียวกันเพื่อไม่ให้ทับกันตอนโผล่มาพร้อมกัน */
+.corner {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;   /* ตัวคั่นใส ๆ ไม่ควรบังของที่อยู่ข้างหลัง */
+}
+.corner > * { pointer-events: auto; }
+
+#toasts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ข้อมูลบนจอมาจากชุดที่เก็บไว้ในเครื่อง กำลังรอของจริงจากชีตมาทับ */
+#syncing {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+#syncing.show { display: flex; }
+
+.spin-sm {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border: 2px solid var(--accent-line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 340px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-size: 13.5px;
+}
+
+.toast svg { width: 18px; height: 18px; color: var(--green); }
+
+.toast.err { border-left-color: var(--danger); }
+.toast.err svg { color: var(--danger); }
+
+/* ── จอแคบ ────────────────────────────────────────────────── */
+@media (max-width: 1180px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 980px) {
+  /* ไซด์บาร์เลิกค้างอยู่ข้าง ๆ กลายเป็นลิ้นชักที่เลื่อนออกมาจากซ้ายเมื่อกดปุ่มสามขีด
+     เมนูแนวตั้งเหมือนจอกว้าง ป้ายชื่อเมนูกับตัวเลขแจ้งเตือนจึงยังอ่านได้ครบ */
+  .nav-toggle { display: flex; }
+
+  .sidebar {
+    top: var(--topbar-h);
+    bottom: 0;
+    left: 0;
+    z-index: 55;
+    width: 264px;
+    max-width: 82vw;
+    border-width: 0 1px 0 0;
+    border-radius: 0;
+    transform: translateX(-100%);
+    transition: transform .22s ease;
+  }
+  body.nav-open .sidebar { transform: none; }
+
+  /* ฉากหลังทึบไว้กดปิด และกันไม่ให้เผลอกดโดนของข้างหลังลิ้นชัก */
+  .nav-scrim {
+    display: block;
+    position: fixed;
+    inset: var(--topbar-h) 0 0;
+    z-index: 50;
+    background: var(--scrim);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s, visibility .2s;
+  }
+  body.nav-open .nav-scrim { opacity: 1; visibility: visible; }
+
+  .app {
+    margin-left: 0;
+    padding: 14px 12px 24px;
+  }
+
+  /* ตารางประวัติ: ซ่อนยอดก่อนทำรายการ ถอยกลับเองได้จากจำนวนกับยอดคงเหลือ */
+  .col-before { display: none; }
+}
+
+@media (max-width: 640px) {
+  /* จอแคบต้องเก็บที่ไว้ให้ชื่อคนที่เข้าระบบกับปุ่ม โลโก้จึงพับเก็บก่อน */
+  .brand { padding: 0 12px; gap: 8px; }
+  .brand small,
+  .brand-logo { display: none; }
+
+  /* เหลือแค่ชื่อคนที่เข้าระบบอยู่ ป้ายสิทธิ์ตัดทิ้งเพื่อเอาที่ให้ปุ่ม */
+  .who { margin: 0 2px; padding-left: 10px; }
+  .who .chip { display: none; }
+
+  .topbar { flex-wrap: wrap; align-items: center; }
+  .topbar .spacer { display: none; }
+  .topbar .btn { width: 100%; }
+
+  .kpis { grid-template-columns: 1fr; gap: 10px; }
+
+  .search { width: 100%; }
+  .filter { flex: 1; min-width: 0; }
+
+  .grid2 { grid-template-columns: 1fr; }
+
+  /* ตารางสินค้า: ซ่อนมูลค่ารวม (คิดจากราคา × จำนวน ที่ยังเห็นอยู่)
+     ตารางประวัติ: ซ่อนคนทำรายการ ดูย้อนหลังได้จากหน้าจอกว้าง */
+  .col-value,
+  .col-user { display: none; }
+
+  th, td { padding-left: 14px; padding-right: 14px; }
+
+  .login-card { padding: 24px 20px 26px; }
+}
