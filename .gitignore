@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build
+.next/
+out/
+
+# env files (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# debug
+npm-debug.log*
+
+# misc
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# database
+sqlite.db
+sqlite.db.*-backup
+drizzle/

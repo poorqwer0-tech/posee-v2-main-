@@ -1,0 +1,313 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================================================
+   ธีมเริ่มต้น "มะนาว × พริก" (lime × chili)
+   สีทุกอย่างมาจากตัวแปร รองรับ light/dark อัตโนมัติ · เปลี่ยนสีแบรนด์ได้ที่หน้า "ตั้งค่า"
+   =================================================================== */
+:root {
+  /* ---- token สี (channel R G B สำหรับ rgb(var / <alpha>)) ---- */
+  --brand-bg: 255 247 236;
+  --brand-sidebar: 42 33 26;
+  --brand-primary: 217 58 43;
+  --brand-primaryDark: 143 28 18;
+  --brand-topbar: 255 249 240;
+  --brand-card: 255 255 255;
+  --brand-cream: 255 251 242;
+  --brand-ink: 36 30 23;
+  --brand-ink2: 52 45 31;
+  --brand-muted: 133 117 82;
+  --brand-muted2: 156 139 111;
+  --brand-muted3: 176 154 127;
+  --brand-border: 240 223 201;
+  --brand-border2: 240 223 201;
+  --brand-border3: 234 217 192;
+  --brand-chip: 243 232 214;
+  --brand-tan: 200 162 122;
+  --brand-tan2: 216 184 143;
+  --brand-sidebarText: 201 183 154;
+  --accent-green: 143 191 30;
+  --accent-greenText: 92 122 18;
+  --accent-greenBg: 238 246 214;
+  --accent-orange: 226 98 44;
+  --accent-orangeBg: 253 235 224;
+  --accent-orangeBorder: 240 195 172;
+
+  /* ---- สีเต็ม (แทน hex เดิมใน className) ---- */
+  --c-surface: #ffffff;
+  --c-on-primary: #fff7ee;
+  --c-on-primary-soft: #f5e4d0;
+  --c-placeholder: #f1e6d0;
+  --c-header: #fbefdd;
+  --c-broth: #fff7ec;
+  --c-surface-2: #fdf5ea;
+  --c-selected: #fceae5;
+  --c-warn-soft: #fef3e0;
+  --c-orange-soft: #fdebe0;
+  --c-border: #f0dfc9;
+  --c-border-strong: #ead9c0;
+  --c-divider: #e4d3bb;
+  --c-divider-soft: #f1e4d2;
+  --c-warn-border: #f0d6b8;
+  --c-muted: #857552;
+  --c-muted-2: #a98e76;
+  --c-primary: #d93a2b;
+  --c-primary-dark: #8f1c12;
+  --c-logo-grad: linear-gradient(145deg, #e1432f, #f5852a); /* พื้นกล่องโลโก้ (white-label override ได้) */
+  --c-lime: #8fbf1e;
+  --c-lime-ink: #5c7a12;
+  --c-orange: #e2622c;
+  --c-orange-dark: #a5401f;
+  --c-warn-ink: #a66a12;
+  --c-tan: #c8a27a;
+
+  /* ---- เงา/ฉากหลัง modal (channel comma สำหรับ rgba) ---- */
+  --c-sh: 111, 78, 55;
+  --c-scrim: 61, 43, 31;
+  --c-sh-o: 192, 115, 78;
+  --c-sh-lime: 124, 155, 94;
+
+  color-scheme: light;
+}
+
+/* ---------- โหมดมืด ---------- */
+:root[data-theme="dark"] {
+  --brand-bg: 23 18 12;
+  --brand-sidebar: 15 12 8;
+  --brand-primary: 255 90 70;
+  --brand-primaryDark: 122 20 12;
+  --brand-topbar: 33 26 18;
+  --brand-card: 33 26 18;
+  --brand-cream: 42 34 22;
+  --brand-ink: 247 238 221;
+  --brand-ink2: 236 226 205;
+  --brand-muted: 183 168 142;
+  --brand-muted2: 160 146 120;
+  --brand-muted3: 150 136 112;
+  --brand-border: 58 48 32;
+  --brand-border2: 58 48 32;
+  --brand-border3: 66 54 36;
+  --brand-chip: 48 40 26;
+  --brand-tan: 176 140 95;
+  --brand-tan2: 168 148 118;
+  --brand-sidebarText: 168 148 118;
+  --accent-green: 180 224 25;
+  --accent-greenText: 199 242 58;
+  --accent-greenBg: 43 51 15;
+  --accent-orange: 255 122 74;
+  --accent-orangeBg: 58 32 27;
+  --accent-orangeBorder: 90 54 40;
+
+  --c-surface: #211a12;
+  --c-on-primary: #fff7ee;
+  --c-on-primary-soft: #e9d6c2;
+  --c-placeholder: #2a2216;
+  --c-header: #2a2216;
+  --c-broth: #17120c;
+  --c-surface-2: #2a2216;
+  --c-selected: #3a201b;
+  --c-warn-soft: #33280f;
+  --c-orange-soft: #3a211c;
+  --c-border: #3a3020;
+  --c-border-strong: #3a3020;
+  --c-divider: #3f3524;
+  --c-divider-soft: #2e2618;
+  --c-warn-border: #4a3a1e;
+  --c-muted: #b7a88e;
+  --c-muted-2: #9c8974;
+  --c-primary: #ff5a46;
+  --c-primary-dark: #7a140c;
+  --c-lime: #b4e019;
+  --c-lime-ink: #c7f23a;
+  --c-orange: #ff7a4a;
+  --c-orange-dark: #7a2e12;
+  --c-warn-ink: #fbbf24;
+  --c-tan: #b0895c;
+
+  --c-sh: 0, 0, 0;
+  --c-scrim: 0, 0, 0;
+  --c-sh-o: 0, 0, 0;
+  --c-sh-lime: 180, 224, 25;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand-bg: 23 18 12;
+    --brand-sidebar: 15 12 8;
+    --brand-primary: 255 90 70;
+    --brand-primaryDark: 122 20 12;
+    --brand-topbar: 33 26 18;
+    --brand-card: 33 26 18;
+    --brand-cream: 42 34 22;
+    --brand-ink: 247 238 221;
+    --brand-ink2: 236 226 205;
+    --brand-muted: 183 168 142;
+    --brand-muted2: 160 146 120;
+    --brand-muted3: 150 136 112;
+    --brand-border: 58 48 32;
+    --brand-border2: 58 48 32;
+    --brand-border3: 66 54 36;
+    --brand-chip: 48 40 26;
+    --brand-tan: 176 140 95;
+    --brand-tan2: 168 148 118;
+    --brand-sidebarText: 168 148 118;
+    --accent-green: 180 224 25;
+    --accent-greenText: 199 242 58;
+    --accent-greenBg: 43 51 15;
+    --accent-orange: 255 122 74;
+    --accent-orangeBg: 58 32 27;
+    --accent-orangeBorder: 90 54 40;
+
+    --c-surface: #211a12;
+    --c-on-primary: #fff7ee;
+    --c-on-primary-soft: #e9d6c2;
+    --c-placeholder: #2a2216;
+    --c-header: #2a2216;
+    --c-broth: #17120c;
+    --c-surface-2: #2a2216;
+    --c-selected: #3a201b;
+    --c-warn-soft: #33280f;
+    --c-orange-soft: #3a211c;
+    --c-border: #3a3020;
+    --c-border-strong: #3a3020;
+    --c-divider: #3f3524;
+    --c-divider-soft: #2e2618;
+    --c-warn-border: #4a3a1e;
+    --c-muted: #b7a88e;
+    --c-muted-2: #9c8974;
+    --c-primary: #ff5a46;
+    --c-primary-dark: #7a140c;
+    --c-lime: #b4e019;
+    --c-lime-ink: #c7f23a;
+    --c-orange: #ff7a4a;
+    --c-orange-dark: #7a2e12;
+    --c-warn-ink: #fbbf24;
+    --c-tan: #b0895c;
+
+    --c-sh: 0, 0, 0;
+    --c-scrim: 0, 0, 0;
+    --c-sh-o: 0, 0, 0;
+    --c-sh-lime: 180, 224, 25;
+
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--c-broth);
+  color: rgb(var(--brand-ink));
+  font-family: var(--font-mali), sans-serif;
+}
+
+/* scrollbar โทนธีมหลัก */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--c-divider);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* ไอน้ำลอยจากชามในโลโก้ */
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(2px) scaleY(0.8);
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px) scaleY(1.1);
+  }
+}
+
+/* ปิด spinner ของ input number */
+input[inputmode="numeric"]::-webkit-outer-spin-button,
+input[inputmode="numeric"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ===== ใบเสร็จ/บิลครัวสำหรับปริ้น (ขาว-ดำเสมอ, ซ่อนบนจอ) ===== */
+.receipt-print,
+.kitchen-ticket-print {
+  display: none;
+}
+@media print {
+  @page {
+    margin: 6mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  .receipt-print,
+  .receipt-print *,
+  .qr-print,
+  .qr-print *,
+  .kitchen-ticket-print,
+  .kitchen-ticket-print * {
+    visibility: visible !important;
+  }
+  .kitchen-ticket-print {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72mm;
+    padding: 4px;
+    font-family: "Mali", sans-serif;
+    line-height: 1.5;
+    color: #000 !important;
+    background: #fff !important;
+  }
+  .kitchen-ticket-print * {
+    color: #000 !important;
+    background: transparent !important;
+  }
+  .qr-print {
+    position: absolute;
+    left: 50%;
+    top: 40px;
+    transform: translateX(-50%);
+    box-shadow: none !important;
+  }
+  .receipt-print {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72mm;
+    color: #000 !important;
+    background: #fff !important;
+  }
+  /* ใบเสร็จเป็นขาว-ดำเสมอ ไม่ว่าธีมไหน */
+  .receipt-print * {
+    color: #000 !important;
+    background: transparent !important;
+    border-color: #bbb !important;
+  }
+}

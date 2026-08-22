@@ -1,0 +1,22 @@
+# systemd service — auto-start POS บน Linux (mini-PC ในร้าน)
+# ติดตั้ง:
+#   sudo cp scripts/pos.service.example /etc/systemd/system/pos.service
+#   (แก้ User / WorkingDirectory / path npm-node ให้ตรงเครื่อง)
+#   sudo systemctl daemon-reload && sudo systemctl enable --now pos
+# ดู log:  journalctl -u pos -f
+[Unit]
+Description=Restaurant POS (standalone)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pos
+WorkingDirectory=/home/pos/pos
+ExecStart=/bin/bash /home/pos/pos/scripts/start-local.sh
+Restart=always
+RestartSec=5
+# environment อ่านจาก .env ใน start-local.sh อยู่แล้ว
+
+[Install]
+WantedBy=multi-user.target
